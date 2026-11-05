@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Secrets and per-machine settings — never commit these
+.env
+*.local.*
+CLAUDE.local.md
+.claude/settings.local.json
+
+# OS / editor / note viewer
+.DS_Store
+Thumbs.db
+.vscode/
+.obsidian/
+
+# Large media — keep a short clip or a still in docs/ instead, and note where the raw file lives
+*.mp4
+*.h264
+*.mkv
+logs/raw/

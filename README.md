@@ -98,3 +98,8 @@ Obsidian 이 만드는 `.obsidian/` 폴더는 `.gitignore` 에 들어 있습니�
 
 - 문서 (Markdown · HTML 의 본문) 는 [CC BY 4.0](LICENSE-docs), 코드 (Python · CSS · JavaScript · 설정 파일) 는 [MIT](LICENSE) 입니다. Copyright (c) 2026 Yongsoo Joo
 - 이 템플릿으로 만든 저장소에서는 `AGENTS.md` 머리말의 「유래」 줄과 README 의 템플릿 링크를 남기는 것으로 출처를 표시할 수 있습니다
+
+## Codex CLI (노트북)
+
+세션 시작 검사, 선택적 안전 pull·프롬프트 기록, `$session-close` 스킬의
+설정과 승인 절차는 [Codex 형상관리 가이드](docs/codex-workflow.md)를 참조합니다.

@@ -1,27 +1,29 @@
-# Handoff: 착수 — 규칙 파일 채우기와 첫 센서 로그
+# Handoff: 종료 기록 정리
 
-**Last session close**: <YYYY-MM-DD HH:MM> (commit <sha>)   ← `date` 와 `git log -1` 로 실측해 적음
-**상태**: ready
-
-## 세션 시작의 순서
-1. `git pull` → `git log --oneline <위 sha>..HEAD` 로 지난 세션 이후 커밋을 **전부** 확인 (노트북 · Pi 양쪽 커밋 포함)
-2. 이 파일 정독 → 「다음 작업 시퀀스」 를 계획으로 보고 → 학생 승인 후 착수
+**Last session close**: 2026-11-06 09:16 (commit d37985b7a6bbc94a167bba6c37d961a06af66dfc)
+위 SHA는 종료 기록 커밋 이전의 이력 검토 기준임. 실제 종료는 push와 clean 확인 후 판정함.
+**상태**: 종료 기록 작성함. 학생 검토 대기함.
 
 ## 다음 작업 시퀀스 (단일)
-1. `AGENTS.md` §0 프로젝트 개요를 채우고 §8 에 주제 규칙 (`topics/`) 을 붙여 넣음 → `rules: fill in project overview and topic rules`
-2. 쓰는 에이전트 도구가 `AGENTS.md` 를 읽는지 확인함 (README 의 「규칙 적재 확인」)
-3. Pi: Raspberry Pi OS 64-bit 설치 · SSH · 사용자 그룹 (`gpio` `i2c` `video`) 확인 · 저장소 clone
-4. 센서 1 개를 읽어 `logs/` 에 CSV 로 저장하고 `tools/check_log.py` 를 통과시킴
-
-## 핵심 진입점
-- `AGENTS.md` — 규칙 원본 · `docs/meeting-notes/TEMPLATE.md` — 회의록 틀 · `logs/experiments/TEMPLATE.md` — 실험 기록 틀
+1. git pull 후 위 기준 이후 커밋 전부와 이 handoff를 확인함.
+2. 학생이 직전 회의록과 AI 사용 기록을 검토함.
+3. §0 핵심 주장과 docs/metrics.md의 지표 정의, trailer 사용 여부를 학생에게 확인함.
+4. Pi 환경과 첫 MPU6050 센서 로그 수집의 목표·단계·검증 방법을 보고하고 승인받음.
+5. 승인 범위에서 Pi 사용자 그룹과 센서 인식을 확인하고 센서 로그를 수집함.
+6. tools/check_log.py로 무결성을 확인하고 결과를 보고한 뒤 문서화 승인을 받음.
 
 ## 확정 (재론 불요)
-- (아직 없음. 형식: `<결정> — 결정자 · YYYY-MM-DD HH:MM · 회의록 경로`)
+- §0와 §8에 이륜 균형 로봇 개요·주제 규칙이 이미 기재되어 있음을 확인함.
+- 이번 세션은 종료 기록만 작성함. 구동·실험·코드 변경은 수행하지 않음.
+- 원격 변경 3개를 pull하여 전체 이력 6개를 확인함.
 
 ## 미결 (결정할 사람)
-- 커밋 trailer (`Assisted-by:`) 사용 여부 — 학생
-- 커밋 메시지 언어 (영어 / 한국어) — 학생
+- 회의록과 AI 사용 기록 검토 — 학생이 결정함.
+- Assisted-by trailer 사용 여부와 §9 기록 — 학생이 결정함.
+- 핵심 주장 구체화, 바퀴 속도 단위, 센서 로그 수집 계획 승인 — 학생이 결정함.
 
 ## 환경 유의
-- Pi 접속 정보 (IP · 계정) 는 `.env` 에만 둠. 커밋하지 않음
+- 프롬프트 기록 훅 설정이 활성화되어 있지 않음. 과거 입력 시각을 확인하지 못함.
+- 샌드박스 bwrap 권한 오류가 발생하여 명령 실행 권한 승인을 사용함.
+- session-close 절차보다 이번 학생 제공 §1-3의 종료 commit·push 지시를 우선 적용함.
+- 장비 접속 정보와 비밀값은 커밋하지 않음.

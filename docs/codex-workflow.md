@@ -117,3 +117,31 @@ python3 -m unittest discover -s tests -p 'test_codex_workflow.py' -v
 upstream 누락, 진행 중 작업, compact, opt-in, URL 제한, 이력 기준,
 원문·시각·권한, 가림, 경로/링크 거부, 하위 디렉터리 실행과 오류 출력의
 비밀값 비노출을 검증함. 테스트의 push는 임시 로컬 bare 저장소에만 수행함.
+
+## 첫 메시지까지 자동으로 시작하기 (Bash)
+
+`SessionStart`는 내부 지시를 전달함. 첫 응답까지 시작하려면 저장소에서
+`bash tools/codex-start.sh`를 실행함. 이 명령이 Codex를 열면서 시작 메시지를
+자동 전달하므로 채팅창에 따로 입력할 필요가 없음. 자동 입력은 회의록에서
+학생이 직접 작성한 프롬프트와 구분하도록 표시함.
+
+평소처럼 `codex`만 입력하려면 아래 설정을 **한 번만** 수행함:
+
+```bash
+# 저장소 루트에서 실행. 같은 줄을 중복 추가하지 않음.
+printf '\nsource %q\n' "$(pwd -P)/tools/codex-shell.bash" >> ~/.bashrc
+source ~/.bashrc
+```
+
+이후 이 checkout과 하위 폴더에서 인자 없이 `codex`를 실행하면 시작 절차를
+자동 요청함. 다른 폴더나 `codex resume`, `codex --version`처럼 인자가 있는
+명령은 원래 CLI에 전달함. 기존 모델·권한·훅 신뢰 설정을 변경하지 않음.
+자동 pull이 실패하거나 결과가 없으면 진행하지 않고 상태를 보고하게 함.
+훅이 미실행된 경우에는 `/hooks`의 신뢰·활성 상태부터 확인함.
+
+이미 개인 `.bashrc`에 `ESD CODEX AUTO START` 블록을 설치했다면 그것으로
+동일한 동작을 사용할 수 있음. 저장소의 최신 스크립트를 사용하도록 전환할
+때는 해당 블록을 제거하고 위 source 줄 하나로 교체함. 두 방식을 중복
+설정하지 않음. 해제하려면 해당 source 줄 또는 기존 블록을 제거하고 새
+터미널을 엶. 저장소를 이동하면 source 경로도 갱신함. 개인 `.bashrc` 자체는
+Git에 포함하지 않음.

@@ -139,6 +139,8 @@ def inspect(root, event):
 
 def main():
     event = json.load(sys.stdin)
+    if not isinstance(event, dict):
+        raise WorkflowError("Hook input must be an object.")
     name = event.get('hook_event_name')
     if name not in ('SessionStart', 'UserPromptSubmit'):
         raise WorkflowError('Unsupported hook event.')

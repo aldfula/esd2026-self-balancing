@@ -163,6 +163,12 @@ class WorkflowTests(unittest.TestCase):
         bad = subprocess.run(['python3', str(SCRIPT)], input='private malformed payload', text=True, capture_output=True)
         self.assertNotEqual(bad.returncode, 0)
         self.assertNotIn('private malformed payload', bad.stdout + bad.stderr)
+        for payload in ('[]', 'null', '"private value"'):
+            invalid = subprocess.run(['python3', str(SCRIPT)], input=payload,
+                                     text=True, capture_output=True)
+            self.assertNotEqual(invalid.returncode, 0)
+            self.assertIn('systemMessage', json.loads(invalid.stdout))
+            self.assertEqual(invalid.stderr, '')
 
 
 if __name__ == '__main__':

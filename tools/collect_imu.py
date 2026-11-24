@@ -8,6 +8,7 @@ Body tilt, body gyro rate, wheel speeds and motor outputs are unmeasured (empty)
 """
 
 import argparse
+from collections import deque
 import csv
 from datetime import datetime
 import json
@@ -28,34 +29,119 @@ FIELDS = ("t", "tick", "theta_deg", "gyro_dps", "wheel_l", "wheel_r",
 
 class CSVWriter:
     """Bounded, nonblocking producer; disk writes occur on a worker thread."""
-    def __init__(self, stream):
+    def __init__(self, stream, *, diagnostics=False):
         self.queue = queue.Queue(maxsize=128)
         self.error = None
         self.rows = 0
+        self.diagnostics = diagnostics
+        if diagnostics:
+            self.origin = time.monotonic()
+            self.history = deque(maxlen=128)
+            self.queue_high_water = 0
+            self.progress = {"operation": "starting", "tick": None, "started_s": 0.0}
+            self.timings = {name: {"count": 0, "last_wall_s": 0.0,
+                                  "max_wall_s": 0.0, "last_thread_cpu_s": 0.0,
+                                  "max_thread_cpu_s": 0.0, "last_tick": None,
+                                  "max_wall_tick": None}
+                            for name in ("header", "row", "flush")}
+            self.first_fault = None
+            self.writer_error = None
         self.thread = threading.Thread(target=self._write, args=(stream,))
         self.thread.start()
+
+    def _begin(self, operation, tick=None):
+        # Only the worker writes progress. Publish a new object for each phase.
+        wall = time.monotonic()
+        self.progress = {"operation": operation, "tick": tick,
+                         "started_s": wall - self.origin}
+        return wall, time.thread_time()
+
+    def _finish(self, operation, started):
+        wall = time.monotonic() - started[0]
+        cpu = time.thread_time() - started[1]
+        previous = self.timings[operation]
+        self.timings[operation] = {
+            "count": previous["count"] + 1,
+            "last_wall_s": wall, "max_wall_s": max(previous["max_wall_s"], wall),
+            "last_thread_cpu_s": cpu,
+            "max_thread_cpu_s": max(previous["max_thread_cpu_s"], cpu),
+            "last_tick": self.progress["tick"],
+            "max_wall_tick": (self.progress["tick"] if wall > previous["max_wall_s"]
+                              else previous["max_wall_tick"]),
+        }
+
+    def _snapshot(self, event, tick=None):
+        progress = self.progress
+        now = time.monotonic() - self.origin
+        size = self.queue.qsize()
+        self.queue_high_water = max(self.queue_high_water, size)
+        return {"event": event, "tick": tick, "t_s": now,
+                "queue_size_approx": size, "rows_completed": self.rows,
+                "last_row_write_wall_s": self.timings["row"]["last_wall_s"],
+                "worker": dict(progress, elapsed_s=max(0.0, now - progress["started_s"]))}
+
+    def _fault(self, event, tick):
+        if self.diagnostics and self.first_fault is None:
+            self.first_fault = self._snapshot(event, tick)
+
+    def report(self):
+        """Read after close; fault/history snapshots retain the pre-drain state."""
+        final = self._snapshot("closed")
+        return {"clock": "monotonic_seconds_since_writer_creation",
+                "queue_capacity": self.queue.maxsize,
+                "queue_high_water_observed": self.queue_high_water,
+                "history_limit": self.history.maxlen,
+                "recent_enqueues": list(self.history),
+                "first_fault": self.first_fault,
+                "writer_error": self.writer_error,
+                "operation_timings": self.timings,
+                "final": final}
 
     def _write(self, stream):
         try:
             writer = csv.DictWriter(stream, fieldnames=FIELDS)
+            if self.diagnostics:
+                started = self._begin("header")
             writer.writeheader()
+            if self.diagnostics:
+                self._finish("header", started)
             while True:
+                if self.diagnostics:
+                    self._begin("waiting_for_row")
                 row = self.queue.get()
                 if row is None:
                     break
+                if self.diagnostics:
+                    started = self._begin("row", row["tick"])
                 writer.writerow(row)
                 self.rows += 1
+                if self.diagnostics:
+                    self._finish("row", started)
+            if self.diagnostics:
+                started = self._begin("flush")
             stream.flush()
+            if self.diagnostics:
+                self._finish("flush", started)
+                self._begin("done")
         except Exception as exc:
+            if self.diagnostics:
+                self.writer_error = {"type": type(exc).__name__, "message": str(exc),
+                                     "errno": getattr(exc, "errno", None),
+                                     "worker": self.progress}
+                self._begin("error")
             self.error = exc
 
     def put(self, row):
         if self.error:
+            self._fault("writer_error", row["tick"])
             raise OSError(f"CSV writer failed: {self.error}")
         try:
             self.queue.put_nowait(row)
         except queue.Full as exc:
+            self._fault("queue_full", row["tick"])
             raise OSError("CSV queue full; acquisition stopped") from exc
+        if self.diagnostics:
+            self.history.append(self._snapshot("enqueued", row["tick"]))
 
     def close(self):
         while self.thread.is_alive():
@@ -70,7 +156,8 @@ class CSVWriter:
 
 
 def collect(sensor, stream, seconds=30.0, vbat=None, *,
-            clock=time.monotonic, sleep=time.sleep, metadata=None):
+            clock=time.monotonic, sleep=time.sleep, metadata=None,
+            writer_diagnostics=False):
     """Return a run record; any fault stops at its first occurrence."""
     if not math.isfinite(seconds) or seconds < 2 / SAMPLE_RATE_HZ:
         raise ValueError("duration must allow at least two samples")
@@ -83,7 +170,7 @@ def collect(sensor, stream, seconds=30.0, vbat=None, *,
                   samples=0, i2c_err=0, sensor_rate_hz=100.0,
                   axis_frame="sensor_uncalibrated", motor_interface="none",
                   vbat=vbat, vbat_source="manual_pre_run" if vbat else "unmeasured")
-    writer = CSVWriter(stream)
+    writer = CSVWriter(stream, diagnostics=writer_diagnostics)
     previous = None
     try:
         result["registers_start"] = sensor.configure(sleep=sleep)
@@ -126,6 +213,8 @@ def collect(sensor, stream, seconds=30.0, vbat=None, *,
         except OSError as exc:
             result.update(status="void", reason=str(exc))
         result["samples"] = writer.rows
+        if writer_diagnostics:
+            result["writer_diagnostics"] = writer.report()
     return result
 
 
@@ -137,6 +226,8 @@ def main():
                         choices=(0x68, 0x69), default=0x68)
     parser.add_argument("--seconds", type=float, default=30.0)
     parser.add_argument("--vbat", type=float, help="manually measured pre-run battery V")
+    parser.add_argument("--writer-diagnostics", action="store_true",
+                        help="save bounded in-memory CSV writer diagnostics in the run JSON")
     args = parser.parse_args()
     if args.bus < 0 or not math.isfinite(args.seconds) or args.seconds < 2 / SAMPLE_RATE_HZ:
         parser.error("bus must be nonnegative and duration must allow two samples")
@@ -157,7 +248,7 @@ def main():
             try:
                 with SMBus(args.bus) as bus:
                     collect(MPU6050(bus, args.address), stream, args.seconds, args.vbat,
-                            metadata=record)
+                            metadata=record, writer_diagnostics=args.writer_diagnostics)
             except (OSError, ValueError) as exc:
                 record.update(status="void", reason=f"{type(exc).__name__}: {exc}")
             sidecar.seek(0)

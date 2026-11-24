@@ -3,6 +3,7 @@
 from contextlib import redirect_stdout
 from contextlib import nullcontext
 import csv
+import errno
 import io
 import json
 from pathlib import Path
@@ -10,6 +11,7 @@ import struct
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 from types import SimpleNamespace
 import unittest
@@ -17,7 +19,7 @@ from unittest.mock import patch
 
 from src.sensing.imu_calib import convert_sample
 from src.sensing.mpu6050 import MPU6050
-from tools.collect_imu import collect
+from tools.collect_imu import CSVWriter, collect
 from tools import check_log
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -72,12 +74,13 @@ class Bus:
 
 
 class IMUTests(unittest.TestCase):
-    def acquire(self, fault=None, seconds=30.0, vbat=None):
+    def acquire(self, fault=None, seconds=30.0, vbat=None, *, writer_diagnostics=False):
         clock = Clock()
         bus = Bus(clock, fault)
         stream = io.StringIO(newline="")
         result = collect(MPU6050(bus), stream, seconds, vbat,
-                         clock=clock, sleep=clock.sleep)
+                         clock=clock, sleep=clock.sleep,
+                         writer_diagnostics=writer_diagnostics)
         rows = list(csv.DictReader(io.StringIO(stream.getvalue())))
         return result, rows, stream.getvalue(), bus
 
@@ -143,6 +146,7 @@ class IMUTests(unittest.TestCase):
     def test_default_run_executes_sensor_path_and_logs_applied_settings(self):
         result, rows, text, bus = self.acquire()
         self.assertEqual(result["status"], "complete", result)
+        self.assertNotIn("writer_diagnostics", result)
         self.assertEqual((bus.samples, len(rows), result["samples"]), (900, 900, 900))
         self.assertEqual((rows[0]["tick"], rows[-1]["tick"]), ("0", "899"))
         self.assertNotEqual(rows[0]["ax_raw"], rows[-1]["ax_raw"])
@@ -214,6 +218,118 @@ class IMUTests(unittest.TestCase):
         self.assertEqual(result["status"], "void")
         self.assertIn("interrupted", result["reason"])
 
+    def test_writer_diagnostics_preserve_full_sensor_log_and_bound_history(self):
+        result, rows, text, bus = self.acquire(writer_diagnostics=True)
+        self.assertEqual((bus.samples, len(rows)), (900, 900))
+        self.assertEqual(self.checker(text, result)[0], 0)
+        report = result["writer_diagnostics"]
+        self.assertEqual(report["queue_capacity"], 128)
+        self.assertEqual(len(report["recent_enqueues"]), 128)
+        self.assertEqual([entry["tick"] for entry in report["recent_enqueues"]],
+                         list(range(772, 900)))
+        self.assertIsNone(report["first_fault"])
+        self.assertIsNone(report["writer_error"])
+        self.assertEqual(report["final"]["rows_completed"], 900)
+        self.assertEqual(report["final"]["worker"]["operation"], "done")
+        self.assertEqual(report["final"]["queue_size_approx"], 0)
+        for name, count in (("header", 1), ("row", 900), ("flush", 1)):
+            timing = report["operation_timings"][name]
+            self.assertEqual(timing["count"], count)
+            self.assertGreaterEqual(timing["max_wall_s"], timing["last_wall_s"])
+            self.assertGreaterEqual(timing["max_thread_cpu_s"], 0)
+        # The diagnostics must survive the same JSON serialization as a real run.
+        self.assertEqual(json.loads(json.dumps(result))["writer_diagnostics"], report)
+
+    def test_diagnostics_distinguish_blocked_write_from_worker_not_started(self):
+        class GatedStream(io.StringIO):
+            def __init__(self):
+                super().__init__()
+                self.calls = 0
+                self.entered = threading.Event()
+                self.release = threading.Event()
+
+            def write(self, value):
+                self.calls += 1
+                if self.calls == 2:  # Header succeeds; block the first data write.
+                    self.entered.set()
+                    if not self.release.wait(2):
+                        raise TimeoutError("test did not release blocked stream")
+                return super().write(value)
+
+        stream = GatedStream()
+        writer = CSVWriter(stream, diagnostics=True)
+        try:
+            writer.put({"tick": 0})
+            self.assertTrue(stream.entered.wait(1))
+            for tick in range(1, 129):
+                writer.put({"tick": tick})
+            with self.assertRaisesRegex(OSError, "CSV queue full"):
+                writer.put({"tick": 129})
+            blocked = writer.first_fault
+            self.assertEqual(blocked["queue_size_approx"], 128)
+            self.assertEqual(blocked["tick"], 129)
+            self.assertEqual(blocked["rows_completed"], 0)
+            self.assertEqual(blocked["worker"]["operation"], "row")
+            self.assertEqual(blocked["worker"]["tick"], 0)
+        finally:
+            stream.release.set()
+            writer.close()
+        report = writer.report()
+        self.assertEqual(report["first_fault"], blocked)
+        self.assertEqual(report["final"]["queue_size_approx"], 0)
+        self.assertEqual(report["final"]["rows_completed"], 129)
+        self.assertEqual(report["queue_high_water_observed"], 128)
+        self.assertEqual(report["operation_timings"]["row"]["max_wall_tick"], 0)
+        self.assertGreaterEqual(report["operation_timings"]["row"]["max_wall_s"],
+                                blocked["worker"]["elapsed_s"])
+
+        entered = threading.Event()
+        release = threading.Event()
+
+        class GatedWorker(CSVWriter):
+            def _write(self, stream):
+                entered.set()
+                if not release.wait(2):
+                    self.error = TimeoutError("test did not release worker")
+                    return
+                super()._write(stream)
+
+        stream = io.StringIO()
+        writer = GatedWorker(stream, diagnostics=True)
+        try:
+            self.assertTrue(entered.wait(1))
+            for tick in range(128):
+                writer.put({"tick": tick})
+            with self.assertRaisesRegex(OSError, "CSV queue full"):
+                writer.put({"tick": 128})
+            delayed = writer.first_fault
+            self.assertEqual(delayed["queue_size_approx"], 128)
+            self.assertEqual(delayed["worker"]["operation"], "starting")
+            self.assertEqual(delayed["rows_completed"], 0)
+        finally:
+            release.set()
+            writer.close()
+        self.assertEqual(writer.report()["first_fault"], delayed)
+        self.assertEqual(writer.rows, 128)
+
+    def test_writer_diagnostics_preserve_disk_full_errno_and_failing_phase(self):
+        class FullDisk(io.StringIO):
+            def write(self, value):
+                if self.tell():
+                    raise OSError(errno.ENOSPC, "injected disk full")
+                return super().write(value)
+
+        clock = Clock()
+        result = collect(MPU6050(Bus(clock)), FullDisk(), 1,
+                         clock=clock, sleep=clock.sleep, writer_diagnostics=True)
+        self.assertEqual(result["status"], "void")
+        self.assertIn("CSV writer failed", result["reason"])
+        report = result["writer_diagnostics"]
+        self.assertEqual(report["writer_error"]["errno"], errno.ENOSPC)
+        self.assertEqual(report["writer_error"]["worker"]["operation"], "row")
+        self.assertEqual(report["writer_error"]["worker"]["tick"], 0)
+        self.assertEqual(result["samples"], 0)
+
     def test_checker_rejects_exact_gap_boundary_and_invalid_rates(self):
         # 20 Hz makes the boundary exactly representable as the same expression.
         with tempfile.TemporaryDirectory() as directory:
@@ -249,7 +365,8 @@ class IMUTests(unittest.TestCase):
         fake_smbus = SimpleNamespace(SMBus=lambda number: nullcontext(bus))
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "saved.csv"
-            arguments = ["collect_imu", "--output", str(path), "--seconds", "1"]
+            arguments = ["collect_imu", "--writer-diagnostics", "--output", str(path),
+                         "--seconds", "1"]
             def virtual_collect(*args, **kwargs):
                 return collect(*args, clock=clock, sleep=clock.sleep, **kwargs)
             with patch.dict(sys.modules, {"smbus2": fake_smbus}), \
@@ -270,6 +387,7 @@ class IMUTests(unittest.TestCase):
             record = json.loads(Path(str(path) + ".json").read_text())
             self.assertEqual(record["seconds"], 1)
             self.assertEqual(record["samples"], 30)
+            self.assertEqual(record["writer_diagnostics"]["operation_timings"]["row"]["count"], 30)
             with path.open() as stream:
                 rows = list(csv.DictReader(stream))
             self.assertEqual(len(rows), 30)

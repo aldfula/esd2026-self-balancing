@@ -1,0 +1,1910 @@
+{
+  "status": "complete",
+  "started_at": "2026-11-27T08:16:06.764211+00:00",
+  "bus": 1,
+  "address": 104,
+  "gyro_bias_config_path": "config/imu_gyro_bias.json",
+  "schema": "mpu6050-sensor-v2",
+  "reason": "",
+  "rate_hz": 30.0,
+  "seconds": 30.0,
+  "target_samples": 900,
+  "samples": 900,
+  "i2c_err": 0,
+  "sensor_rate_hz": 100.0,
+  "axis_frame": "sensor_uncalibrated",
+  "motor_interface": "none",
+  "vbat": 11.25,
+  "vbat_source": "manual_pre_run",
+  "gyro_bias": {
+    "applied": true,
+    "config": {
+      "schema": "mpu6050-gyro-bias-v1",
+      "axis_frame": "sensor",
+      "units": "deg/s",
+      "operation": "g_corrected = g - b",
+      "bias_dps": {
+        "x": -1.48704,
+        "y": 1.471874,
+        "z": -2.600636
+      },
+      "evidence": {
+        "source_log": "logs/imu-replacement-static-scout-2026-11-24.csv",
+        "validation_record": "logs/experiments/2026-11-24-imu-gyro-bias-confirmation-resume.md",
+        "adoption_commit": "d509491d44742c9c2242348784b1f9282e86ee07",
+        "scope": "Replacement MPU6050, stationary sensor axes, observed 24.03-24.13 deg C; body axes and upright offset unmeasured."
+      }
+    }
+  },
+  "registers_start": {
+    "PWR_MGMT_1": 1,
+    "PWR_MGMT_2": 0,
+    "SMPLRT_DIV": 9,
+    "CONFIG": 5,
+    "GYRO_CONFIG": 0,
+    "ACCEL_CONFIG": 0,
+    "FIFO_EN": 0,
+    "USER_CTRL": 0,
+    "INT_PIN_CFG": 0,
+    "INT_ENABLE": 1,
+    "WHO_AM_I": 104
+  },
+  "registers_end": {
+    "PWR_MGMT_1": 1,
+    "PWR_MGMT_2": 0,
+    "SMPLRT_DIV": 9,
+    "CONFIG": 5,
+    "GYRO_CONFIG": 0,
+    "ACCEL_CONFIG": 0,
+    "FIFO_EN": 0,
+    "USER_CTRL": 0,
+    "INT_PIN_CFG": 0,
+    "INT_ENABLE": 1,
+    "WHO_AM_I": 104
+  },
+  "writer_diagnostics": {
+    "clock": "monotonic_seconds_since_writer_creation",
+    "queue_capacity": 128,
+    "queue_high_water_observed": 1,
+    "history_limit": 128,
+    "recent_enqueues": [
+      {
+        "event": "enqueued",
+        "tick": 772,
+        "t_s": 26.04682999299996,
+        "queue_size_approx": 1,
+        "rows_completed": 772,
+        "last_row_write_wall_s": 0.0001511169999730555,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.013726794000036,
+          "elapsed_s": 0.03310319899992464
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 773,
+        "t_s": 26.080167940000024,
+        "queue_size_approx": 1,
+        "rows_completed": 773,
+        "last_row_write_wall_s": 0.00017481199995472707,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.047077602999934,
+          "elapsed_s": 0.033090337000089676
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 774,
+        "t_s": 26.113522708000005,
+        "queue_size_approx": 1,
+        "rows_completed": 774,
+        "last_row_write_wall_s": 0.00015247199996792915,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.080393366999942,
+          "elapsed_s": 0.033129341000062595
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 775,
+        "t_s": 26.14683722199993,
+        "queue_size_approx": 1,
+        "rows_completed": 775,
+        "last_row_write_wall_s": 0.0001511169999730555,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.11374948899993,
+          "elapsed_s": 0.03308773300000212
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 776,
+        "t_s": 26.18018787599999,
+        "queue_size_approx": 1,
+        "rows_completed": 776,
+        "last_row_write_wall_s": 0.00018038400003206334,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.147093319999954,
+          "elapsed_s": 0.0330945560000373
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 777,
+        "t_s": 26.21351207600003,
+        "queue_size_approx": 1,
+        "rows_completed": 777,
+        "last_row_write_wall_s": 0.000160075000053439,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.180424655000024,
+          "elapsed_s": 0.033087421000004724
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 778,
+        "t_s": 26.246919229000014,
+        "queue_size_approx": 1,
+        "rows_completed": 778,
+        "last_row_write_wall_s": 0.00015018099998087564,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.213735680000013,
+          "elapsed_s": 0.03318354900000031
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 779,
+        "t_s": 26.28027160099998,
+        "queue_size_approx": 1,
+        "rows_completed": 779,
+        "last_row_write_wall_s": 0.00017278100006024033,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.24720568600003,
+          "elapsed_s": 0.03306591499995193
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 780,
+        "t_s": 26.313526854999964,
+        "queue_size_approx": 1,
+        "rows_completed": 780,
+        "last_row_write_wall_s": 0.0001747070000419626,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.28053665599998,
+          "elapsed_s": 0.03299019899998257
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 781,
+        "t_s": 26.346894537000026,
+        "queue_size_approx": 1,
+        "rows_completed": 781,
+        "last_row_write_wall_s": 0.00015283700008694723,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.313756135999938,
+          "elapsed_s": 0.03313840100008747
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 782,
+        "t_s": 26.380189940000037,
+        "queue_size_approx": 1,
+        "rows_completed": 782,
+        "last_row_write_wall_s": 0.00017397900001014932,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.34718239999995,
+          "elapsed_s": 0.0330075400000851
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 783,
+        "t_s": 26.413614746999997,
+        "queue_size_approx": 1,
+        "rows_completed": 783,
+        "last_row_write_wall_s": 0.00033670899995286163,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.38060882100001,
+          "elapsed_s": 0.033005925999987085
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 784,
+        "t_s": 26.446883019999973,
+        "queue_size_approx": 1,
+        "rows_completed": 784,
+        "last_row_write_wall_s": 0.00018329900001390342,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.41388886300001,
+          "elapsed_s": 0.03299415699996189
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 785,
+        "t_s": 26.480197221000026,
+        "queue_size_approx": 1,
+        "rows_completed": 785,
+        "last_row_write_wall_s": 0.00016736499992475729,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.447156145999998,
+          "elapsed_s": 0.033041075000028286
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 786,
+        "t_s": 26.513507257000015,
+        "queue_size_approx": 1,
+        "rows_completed": 786,
+        "last_row_write_wall_s": 0.00015606499994191836,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.480432698999948,
+          "elapsed_s": 0.033074558000066645
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 787,
+        "t_s": 26.546839580999972,
+        "queue_size_approx": 1,
+        "rows_completed": 787,
+        "last_row_write_wall_s": 0.00015195200001016929,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.513738673000034,
+          "elapsed_s": 0.03310090799993759
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 788,
+        "t_s": 26.580182631999946,
+        "queue_size_approx": 1,
+        "rows_completed": 788,
+        "last_row_write_wall_s": 0.00017632099991260475,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.547098542999947,
+          "elapsed_s": 0.03308408899999904
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 789,
+        "t_s": 26.613500531,
+        "queue_size_approx": 1,
+        "rows_completed": 789,
+        "last_row_write_wall_s": 0.00015429400002631155,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.580412120000005,
+          "elapsed_s": 0.03308841099999427
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 790,
+        "t_s": 26.646850039000014,
+        "queue_size_approx": 1,
+        "rows_completed": 790,
+        "last_row_write_wall_s": 0.00014741999996203958,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.61372642599997,
+          "elapsed_s": 0.033123613000043406
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 791,
+        "t_s": 26.680190745999994,
+        "queue_size_approx": 1,
+        "rows_completed": 791,
+        "last_row_write_wall_s": 0.0001854350000485283,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.647111449000022,
+          "elapsed_s": 0.03307929699997203
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 792,
+        "t_s": 26.713515153999992,
+        "queue_size_approx": 1,
+        "rows_completed": 792,
+        "last_row_write_wall_s": 0.00015215899998111126,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.680418204000034,
+          "elapsed_s": 0.03309694999995827
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 793,
+        "t_s": 26.746837011000025,
+        "queue_size_approx": 1,
+        "rows_completed": 793,
+        "last_row_write_wall_s": 0.00015111800007616694,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.71374063299993,
+          "elapsed_s": 0.03309637800009568
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 794,
+        "t_s": 26.78018151999993,
+        "queue_size_approx": 1,
+        "rows_completed": 794,
+        "last_row_write_wall_s": 0.0001840290000245659,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.747096858999953,
+          "elapsed_s": 0.03308466099997531
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 795,
+        "t_s": 26.81350144999999,
+        "queue_size_approx": 1,
+        "rows_completed": 795,
+        "last_row_write_wall_s": 0.0001563259999102229,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.780413039999985,
+          "elapsed_s": 0.03308841000000484
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 796,
+        "t_s": 26.84683840799994,
+        "queue_size_approx": 1,
+        "rows_completed": 796,
+        "last_row_write_wall_s": 0.000152472000081616,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.813726303999943,
+          "elapsed_s": 0.03311210399999709
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 797,
+        "t_s": 26.880174377000003,
+        "queue_size_approx": 1,
+        "rows_completed": 797,
+        "last_row_write_wall_s": 0.00017856099998425634,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.847091694000028,
+          "elapsed_s": 0.03308268299997508
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 798,
+        "t_s": 26.91355648299998,
+        "queue_size_approx": 1,
+        "rows_completed": 798,
+        "last_row_write_wall_s": 0.00015533500004494272,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.880403969999975,
+          "elapsed_s": 0.033152513000004546
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 799,
+        "t_s": 26.946840116999965,
+        "queue_size_approx": 1,
+        "rows_completed": 799,
+        "last_row_write_wall_s": 0.00016866700002537982,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.91380544699996,
+          "elapsed_s": 0.03303467000000637
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 800,
+        "t_s": 26.980184000999998,
+        "queue_size_approx": 1,
+        "rows_completed": 800,
+        "last_row_write_wall_s": 0.00017585299997335824,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.947100433999935,
+          "elapsed_s": 0.03308356700006243
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 801,
+        "t_s": 27.01350559699995,
+        "queue_size_approx": 1,
+        "rows_completed": 801,
+        "last_row_write_wall_s": 0.00015090900001268892,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 26.980410208999956,
+          "elapsed_s": 0.033095387999992454
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 802,
+        "t_s": 27.046833129999982,
+        "queue_size_approx": 1,
+        "rows_completed": 802,
+        "last_row_write_wall_s": 0.00014960800001517782,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.013727796000012,
+          "elapsed_s": 0.033105333999969844
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 803,
+        "t_s": 27.080173629,
+        "queue_size_approx": 1,
+        "rows_completed": 803,
+        "last_row_write_wall_s": 0.00017606199992314941,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.047084541999993,
+          "elapsed_s": 0.033089087000007567
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 804,
+        "t_s": 27.113515430000007,
+        "queue_size_approx": 1,
+        "rows_completed": 804,
+        "last_row_write_wall_s": 0.00014945199995963776,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.08039660899999,
+          "elapsed_s": 0.033118821000016396
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 805,
+        "t_s": 27.146863324000037,
+        "queue_size_approx": 1,
+        "rows_completed": 805,
+        "last_row_write_wall_s": 0.00015215899998111126,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.113743616999955,
+          "elapsed_s": 0.0331197070000826
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 806,
+        "t_s": 27.18019606400003,
+        "queue_size_approx": 1,
+        "rows_completed": 806,
+        "last_row_write_wall_s": 0.00015804399993157858,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.147121297000012,
+          "elapsed_s": 0.033074767000016436
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 807,
+        "t_s": 27.213520003999975,
+        "queue_size_approx": 1,
+        "rows_completed": 807,
+        "last_row_write_wall_s": 0.00015429500001573615,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.180425344000014,
+          "elapsed_s": 0.03309465999996064
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 808,
+        "t_s": 27.24689450699998,
+        "queue_size_approx": 1,
+        "rows_completed": 808,
+        "last_row_write_wall_s": 0.00015929300002426316,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.21375579300002,
+          "elapsed_s": 0.0331387139999606
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 809,
+        "t_s": 27.28018438999993,
+        "queue_size_approx": 1,
+        "rows_completed": 809,
+        "last_row_write_wall_s": 0.00017147900007330463,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.247176694000018,
+          "elapsed_s": 0.03300769599991327
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 810,
+        "t_s": 27.313630442999965,
+        "queue_size_approx": 1,
+        "rows_completed": 810,
+        "last_row_write_wall_s": 0.00015471100005015614,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.280413723000038,
+          "elapsed_s": 0.03321671999992759
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 811,
+        "t_s": 27.346887727999956,
+        "queue_size_approx": 1,
+        "rows_completed": 811,
+        "last_row_write_wall_s": 0.00017626900000777823,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.31390185099997,
+          "elapsed_s": 0.03298587699998734
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 812,
+        "t_s": 27.38024520299996,
+        "queue_size_approx": 1,
+        "rows_completed": 812,
+        "last_row_write_wall_s": 0.0003330630000846213,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.347334780999972,
+          "elapsed_s": 0.032910421999986283
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 813,
+        "t_s": 27.413517746000025,
+        "queue_size_approx": 1,
+        "rows_completed": 813,
+        "last_row_write_wall_s": 0.00016460500000903266,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.380492032999996,
+          "elapsed_s": 0.0330257130000291
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 814,
+        "t_s": 27.44683501999998,
+        "queue_size_approx": 1,
+        "rows_completed": 814,
+        "last_row_write_wall_s": 0.00015351300010024715,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.413746661999994,
+          "elapsed_s": 0.03308835799998633
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 815,
+        "t_s": 27.48019999400003,
+        "queue_size_approx": 1,
+        "rows_completed": 815,
+        "last_row_write_wall_s": 0.00019038099992485513,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.447099242000036,
+          "elapsed_s": 0.03310075199999574
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 816,
+        "t_s": 27.513501489999953,
+        "queue_size_approx": 1,
+        "rows_completed": 816,
+        "last_row_write_wall_s": 0.0001579390000188141,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.48043578399995,
+          "elapsed_s": 0.03306570600000214
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 817,
+        "t_s": 27.54696951799997,
+        "queue_size_approx": 1,
+        "rows_completed": 817,
+        "last_row_write_wall_s": 0.00015429400002631155,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.51372728199999,
+          "elapsed_s": 0.03324223599997822
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 818,
+        "t_s": 27.58024981999995,
+        "queue_size_approx": 1,
+        "rows_completed": 818,
+        "last_row_write_wall_s": 0.00018204899993179424,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.547246394000013,
+          "elapsed_s": 0.03300342599993655
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 819,
+        "t_s": 27.613517416000036,
+        "queue_size_approx": 1,
+        "rows_completed": 819,
+        "last_row_write_wall_s": 0.00017106200004946004,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.580505345000006,
+          "elapsed_s": 0.03301207100003012
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 820,
+        "t_s": 27.646845937999956,
+        "queue_size_approx": 1,
+        "rows_completed": 820,
+        "last_row_write_wall_s": 0.0001609600000165301,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.613754038000025,
+          "elapsed_s": 0.03309189999993123
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 821,
+        "t_s": 27.68018138599996,
+        "queue_size_approx": 1,
+        "rows_completed": 821,
+        "last_row_write_wall_s": 0.0001835079999636946,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.647105368999974,
+          "elapsed_s": 0.03307601699998486
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 822,
+        "t_s": 27.71351266800002,
+        "queue_size_approx": 1,
+        "rows_completed": 822,
+        "last_row_write_wall_s": 0.00015648199996576295,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.680413895000015,
+          "elapsed_s": 0.033098773000006076
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 823,
+        "t_s": 27.74684400199999,
+        "queue_size_approx": 1,
+        "rows_completed": 823,
+        "last_row_write_wall_s": 0.00015168999993875332,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.71373861500001,
+          "elapsed_s": 0.03310538699997778
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 824,
+        "t_s": 27.780186947999937,
+        "queue_size_approx": 1,
+        "rows_completed": 824,
+        "last_row_write_wall_s": 0.00017507200004729384,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.74710010000001,
+          "elapsed_s": 0.03308684799992534
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 825,
+        "t_s": 27.813835099000016,
+        "queue_size_approx": 1,
+        "rows_completed": 825,
+        "last_row_write_wall_s": 0.00015533599992068048,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.78042101999995,
+          "elapsed_s": 0.03341407900006743
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 826,
+        "t_s": 27.847112433000007,
+        "queue_size_approx": 1,
+        "rows_completed": 826,
+        "last_row_write_wall_s": 0.00019480800006022037,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.81415571699995,
+          "elapsed_s": 0.032956716000057895
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 827,
+        "t_s": 27.880205372999967,
+        "queue_size_approx": 1,
+        "rows_completed": 827,
+        "last_row_write_wall_s": 0.00019121499997254432,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.84740659700003,
+          "elapsed_s": 0.03279877599993597
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 828,
+        "t_s": 27.91351603399994,
+        "queue_size_approx": 1,
+        "rows_completed": 828,
+        "last_row_write_wall_s": 0.00015622099999745842,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.880439704999958,
+          "elapsed_s": 0.03307632899998225
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 829,
+        "t_s": 27.94684216099995,
+        "queue_size_approx": 1,
+        "rows_completed": 829,
+        "last_row_write_wall_s": 0.00015637699993931164,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.913749011999926,
+          "elapsed_s": 0.033093149000023914
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 830,
+        "t_s": 27.980186826000022,
+        "queue_size_approx": 1,
+        "rows_completed": 830,
+        "last_row_write_wall_s": 0.0001764769999681448,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.94710122799995,
+          "elapsed_s": 0.033085598000070604
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 831,
+        "t_s": 28.014788810000027,
+        "queue_size_approx": 1,
+        "rows_completed": 831,
+        "last_row_write_wall_s": 0.00015002400004959782,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 27.98041594999995,
+          "elapsed_s": 0.03437286000007589
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 832,
+        "t_s": 28.048263764000012,
+        "queue_size_approx": 1,
+        "rows_completed": 832,
+        "last_row_write_wall_s": 0.00033400100005565037,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.01527351200002,
+          "elapsed_s": 0.032990251999990505
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 833,
+        "t_s": 28.081634205,
+        "queue_size_approx": 1,
+        "rows_completed": 833,
+        "last_row_write_wall_s": 0.000289216999931341,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.048704983999983,
+          "elapsed_s": 0.032929221000017606
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 834,
+        "t_s": 28.115050784000005,
+        "queue_size_approx": 1,
+        "rows_completed": 834,
+        "last_row_write_wall_s": 0.00030161100005443586,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.082096046999936,
+          "elapsed_s": 0.032954737000068235
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 835,
+        "t_s": 28.14826510900002,
+        "queue_size_approx": 1,
+        "rows_completed": 835,
+        "last_row_write_wall_s": 0.0003045790000442139,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.115501950999942,
+          "elapsed_s": 0.032763158000079784
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 836,
+        "t_s": 28.18164148699998,
+        "queue_size_approx": 1,
+        "rows_completed": 836,
+        "last_row_write_wall_s": 0.0003053599999702783,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.148713983999983,
+          "elapsed_s": 0.03292750299999625
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 837,
+        "t_s": 28.21501932199999,
+        "queue_size_approx": 1,
+        "rows_completed": 837,
+        "last_row_write_wall_s": 0.00031296300005578814,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.18210567099993,
+          "elapsed_s": 0.03291365100005805
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 838,
+        "t_s": 28.248359612999934,
+        "queue_size_approx": 1,
+        "rows_completed": 838,
+        "last_row_write_wall_s": 0.00030083000001468463,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.215467572999955,
+          "elapsed_s": 0.032892039999978806
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 839,
+        "t_s": 28.281621636999944,
+        "queue_size_approx": 1,
+        "rows_completed": 839,
+        "last_row_write_wall_s": 0.000320669999950951,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.248837858,
+          "elapsed_s": 0.032783778999942115
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 840,
+        "t_s": 28.31513173999997,
+        "queue_size_approx": 1,
+        "rows_completed": 840,
+        "last_row_write_wall_s": 0.0002972370000406954,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.28206650300001,
+          "elapsed_s": 0.03306523699995978
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 841,
+        "t_s": 28.34850363999999,
+        "queue_size_approx": 1,
+        "rows_completed": 841,
+        "last_row_write_wall_s": 0.0005959830000392685,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.315889620999997,
+          "elapsed_s": 0.03261401899999328
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 842,
+        "t_s": 28.381683803999977,
+        "queue_size_approx": 1,
+        "rows_completed": 842,
+        "last_row_write_wall_s": 0.0003443629999537734,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.349037342999964,
+          "elapsed_s": 0.032646461000013005
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 843,
+        "t_s": 28.41509397799996,
+        "queue_size_approx": 1,
+        "rows_completed": 843,
+        "last_row_write_wall_s": 0.0003248350000149003,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.382164495999973,
+          "elapsed_s": 0.03292948199998591
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 844,
+        "t_s": 28.44827950499996,
+        "queue_size_approx": 1,
+        "rows_completed": 844,
+        "last_row_write_wall_s": 0.0003205649999244997,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.415572535000024,
+          "elapsed_s": 0.03270696999993561
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 845,
+        "t_s": 28.481614327999978,
+        "queue_size_approx": 1,
+        "rows_completed": 845,
+        "last_row_write_wall_s": 0.0002933830000984017,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.44871775799993,
+          "elapsed_s": 0.032896570000048087
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 846,
+        "t_s": 28.51503517699996,
+        "queue_size_approx": 1,
+        "rows_completed": 846,
+        "last_row_write_wall_s": 0.0002993199999536955,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.482063203999928,
+          "elapsed_s": 0.03297197300003063
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 847,
+        "t_s": 28.548261373999935,
+        "queue_size_approx": 1,
+        "rows_completed": 847,
+        "last_row_write_wall_s": 0.00029708099998515536,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.515488739000034,
+          "elapsed_s": 0.03277263499990113
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 848,
+        "t_s": 28.581614475000038,
+        "queue_size_approx": 1,
+        "rows_completed": 848,
+        "last_row_write_wall_s": 0.0002917159999924479,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.54870259500001,
+          "elapsed_s": 0.03291188000002876
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 849,
+        "t_s": 28.615023972000017,
+        "queue_size_approx": 1,
+        "rows_completed": 849,
+        "last_row_write_wall_s": 0.0002947369999901639,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.582058975999985,
+          "elapsed_s": 0.03296499600003244
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 850,
+        "t_s": 28.64829005799993,
+        "queue_size_approx": 1,
+        "rows_completed": 850,
+        "last_row_write_wall_s": 0.00029312299989214807,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.615466441999956,
+          "elapsed_s": 0.0328236159999733
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 851,
+        "t_s": 28.68160603000001,
+        "queue_size_approx": 1,
+        "rows_completed": 851,
+        "last_row_write_wall_s": 0.0003009860000702247,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.648734141999967,
+          "elapsed_s": 0.032871888000045146
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 852,
+        "t_s": 28.715022349000037,
+        "queue_size_approx": 1,
+        "rows_completed": 852,
+        "last_row_write_wall_s": 0.00030457899993052706,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.682057560999965,
+          "elapsed_s": 0.032964788000072076
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 853,
+        "t_s": 28.748255940000035,
+        "queue_size_approx": 1,
+        "rows_completed": 853,
+        "last_row_write_wall_s": 0.0002939560000640995,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.715474712999935,
+          "elapsed_s": 0.032781227000100444
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 854,
+        "t_s": 28.78159992799999,
+        "queue_size_approx": 1,
+        "rows_completed": 854,
+        "last_row_write_wall_s": 0.00029109199999766133,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.748696431999974,
+          "elapsed_s": 0.032903496000017185
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 855,
+        "t_s": 28.81502577599997,
+        "queue_size_approx": 1,
+        "rows_completed": 855,
+        "last_row_write_wall_s": 0.0002978620000249066,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.782038649000015,
+          "elapsed_s": 0.03298712699995576
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 856,
+        "t_s": 28.848256972999934,
+        "queue_size_approx": 1,
+        "rows_completed": 856,
+        "last_row_write_wall_s": 0.0003025480000360403,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.815475848999995,
+          "elapsed_s": 0.032781123999939155
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 857,
+        "t_s": 28.881579662000036,
+        "queue_size_approx": 1,
+        "rows_completed": 857,
+        "last_row_write_wall_s": 0.00030051700002786674,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.84870975299998,
+          "elapsed_s": 0.032869909000055486
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 858,
+        "t_s": 28.915023683999948,
+        "queue_size_approx": 1,
+        "rows_completed": 858,
+        "last_row_write_wall_s": 0.00028838399998676323,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.88201015599998,
+          "elapsed_s": 0.03301352799996948
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 859,
+        "t_s": 28.948328876999994,
+        "queue_size_approx": 1,
+        "rows_completed": 859,
+        "last_row_write_wall_s": 0.00030150600002798456,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.91547104899996,
+          "elapsed_s": 0.032857828000032896
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 860,
+        "t_s": 28.981606263000003,
+        "queue_size_approx": 1,
+        "rows_completed": 860,
+        "last_row_write_wall_s": 0.00030780800000229647,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.94879571799993,
+          "elapsed_s": 0.03281054500007485
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 861,
+        "t_s": 29.01503065299994,
+        "queue_size_approx": 1,
+        "rows_completed": 861,
+        "last_row_write_wall_s": 0.0002990599999748156,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 28.982050346999927,
+          "elapsed_s": 0.032980306000013115
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 862,
+        "t_s": 29.048240811000028,
+        "queue_size_approx": 1,
+        "rows_completed": 862,
+        "last_row_write_wall_s": 0.00029213299990260566,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.01547161299993,
+          "elapsed_s": 0.03276919800009637
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 863,
+        "t_s": 29.08158167499994,
+        "queue_size_approx": 1,
+        "rows_completed": 863,
+        "last_row_write_wall_s": 0.0002891139999974257,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.048673387000008,
+          "elapsed_s": 0.03290828799993051
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 864,
+        "t_s": 29.11502064499996,
+        "queue_size_approx": 1,
+        "rows_completed": 864,
+        "last_row_write_wall_s": 0.0002891130000080011,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.082013210000014,
+          "elapsed_s": 0.03300743499994496
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 865,
+        "t_s": 29.14827673299999,
+        "queue_size_approx": 1,
+        "rows_completed": 865,
+        "last_row_write_wall_s": 0.00030353700003615813,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.115468999999962,
+          "elapsed_s": 0.03280773300002693
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 866,
+        "t_s": 29.18161540899996,
+        "queue_size_approx": 1,
+        "rows_completed": 866,
+        "last_row_write_wall_s": 0.0002958300000273084,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.148715557999935,
+          "elapsed_s": 0.03289985100002468
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 867,
+        "t_s": 29.215019126000016,
+        "queue_size_approx": 1,
+        "rows_completed": 867,
+        "last_row_write_wall_s": 0.0003041630000097939,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.182065951000027,
+          "elapsed_s": 0.03295317499998873
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 868,
+        "t_s": 29.248337336999953,
+        "queue_size_approx": 1,
+        "rows_completed": 868,
+        "last_row_write_wall_s": 0.0003001530000119601,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.215462637999963,
+          "elapsed_s": 0.03287469899998996
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 869,
+        "t_s": 29.281600819000005,
+        "queue_size_approx": 1,
+        "rows_completed": 869,
+        "last_row_write_wall_s": 0.0003160350000825929,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.248813446999975,
+          "elapsed_s": 0.03278737200002979
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 870,
+        "t_s": 29.315111547000015,
+        "queue_size_approx": 1,
+        "rows_completed": 870,
+        "last_row_write_wall_s": 0.0005468779999091566,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.282297669999934,
+          "elapsed_s": 0.03281387700008054
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 871,
+        "t_s": 29.34825880099993,
+        "queue_size_approx": 1,
+        "rows_completed": 871,
+        "last_row_write_wall_s": 0.0003202020000117045,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.31558432500003,
+          "elapsed_s": 0.03267447599989737
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 872,
+        "t_s": 29.381583052999986,
+        "queue_size_approx": 1,
+        "rows_completed": 872,
+        "last_row_write_wall_s": 0.00029307099998732156,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.348702000000003,
+          "elapsed_s": 0.032881052999982785
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 873,
+        "t_s": 29.41501994099997,
+        "queue_size_approx": 1,
+        "rows_completed": 873,
+        "last_row_write_wall_s": 0.00029291400005604373,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.38201724399994,
+          "elapsed_s": 0.033002697000029
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 874,
+        "t_s": 29.448275142999933,
+        "queue_size_approx": 1,
+        "rows_completed": 874,
+        "last_row_write_wall_s": 0.0002936429999635948,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.41545798499999,
+          "elapsed_s": 0.03281715799994345
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 875,
+        "t_s": 29.481593353999983,
+        "queue_size_approx": 1,
+        "rows_completed": 875,
+        "last_row_write_wall_s": 0.0002982780000593266,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.448715999,
+          "elapsed_s": 0.032877354999982344
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 876,
+        "t_s": 29.51504133399999,
+        "queue_size_approx": 1,
+        "rows_completed": 876,
+        "last_row_write_wall_s": 0.0002916129999448458,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.482024160000037,
+          "elapsed_s": 0.03301717399995141
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 877,
+        "t_s": 29.54827185299996,
+        "queue_size_approx": 1,
+        "rows_completed": 877,
+        "last_row_write_wall_s": 0.0003122860000530636,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.515511143000026,
+          "elapsed_s": 0.03276070999993408
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 878,
+        "t_s": 29.58159396999997,
+        "queue_size_approx": 1,
+        "rows_completed": 878,
+        "last_row_write_wall_s": 0.0003060889999915162,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.548720831999958,
+          "elapsed_s": 0.03287313800001357
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 879,
+        "t_s": 29.61502237000002,
+        "queue_size_approx": 1,
+        "rows_completed": 879,
+        "last_row_write_wall_s": 0.00029957999993257545,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.582035034,
+          "elapsed_s": 0.03298733600001924
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 880,
+        "t_s": 29.64826064800002,
+        "queue_size_approx": 1,
+        "rows_completed": 880,
+        "last_row_write_wall_s": 0.00030181900001480244,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.61546733900002,
+          "elapsed_s": 0.03279330899999877
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 881,
+        "t_s": 29.681581359000006,
+        "queue_size_approx": 1,
+        "rows_completed": 881,
+        "last_row_write_wall_s": 0.0002973409999640353,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.648707075999937,
+          "elapsed_s": 0.03287428300006923
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 882,
+        "t_s": 29.71501918399997,
+        "queue_size_approx": 1,
+        "rows_completed": 882,
+        "last_row_write_wall_s": 0.0002870309999707388,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.68200810299993,
+          "elapsed_s": 0.033011081000040576
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 883,
+        "t_s": 29.74825673299995,
+        "queue_size_approx": 1,
+        "rows_completed": 883,
+        "last_row_write_wall_s": 0.0002968720000353642,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.715468214999987,
+          "elapsed_s": 0.032788517999961186
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 884,
+        "t_s": 29.781591139999932,
+        "queue_size_approx": 1,
+        "rows_completed": 884,
+        "last_row_write_wall_s": 0.00029525799993734836,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.74869201699994,
+          "elapsed_s": 0.03289912299999287
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 885,
+        "t_s": 29.815008604000013,
+        "queue_size_approx": 1,
+        "rows_completed": 885,
+        "last_row_write_wall_s": 0.00029426799994780595,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.78202704900002,
+          "elapsed_s": 0.03298155499999211
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 886,
+        "t_s": 29.848246100999972,
+        "queue_size_approx": 1,
+        "rows_completed": 886,
+        "last_row_write_wall_s": 0.0002927069999714149,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.815447585000015,
+          "elapsed_s": 0.03279851599995709
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 887,
+        "t_s": 29.881584986000007,
+        "queue_size_approx": 1,
+        "rows_completed": 887,
+        "last_row_write_wall_s": 0.00029426799994780595,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.84868154100002,
+          "elapsed_s": 0.032903444999988096
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 888,
+        "t_s": 29.91502765300004,
+        "queue_size_approx": 1,
+        "rows_completed": 888,
+        "last_row_write_wall_s": 0.00029291400005604373,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.882018655000024,
+          "elapsed_s": 0.03300899800001389
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 889,
+        "t_s": 29.948255569000025,
+        "queue_size_approx": 1,
+        "rows_completed": 889,
+        "last_row_write_wall_s": 0.00029989300003308017,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.915471424999964,
+          "elapsed_s": 0.03278414400006113
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 890,
+        "t_s": 29.981572686999925,
+        "queue_size_approx": 1,
+        "rows_completed": 890,
+        "last_row_write_wall_s": 0.00028796800006603007,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.94868502099996,
+          "elapsed_s": 0.032887665999965066
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 891,
+        "t_s": 30.015001762999987,
+        "queue_size_approx": 1,
+        "rows_completed": 891,
+        "last_row_write_wall_s": 0.0002861970000367364,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 29.98200078499997,
+          "elapsed_s": 0.03300097800001822
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 892,
+        "t_s": 30.048245717999976,
+        "queue_size_approx": 1,
+        "rows_completed": 892,
+        "last_row_write_wall_s": 0.0002893219999577923,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 30.015433349999967,
+          "elapsed_s": 0.03281236800000897
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 893,
+        "t_s": 30.08158673799994,
+        "queue_size_approx": 1,
+        "rows_completed": 893,
+        "last_row_write_wall_s": 0.0002971330000036687,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 30.04869032299996,
+          "elapsed_s": 0.03289641499998197
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 894,
+        "t_s": 30.115006805000007,
+        "queue_size_approx": 1,
+        "rows_completed": 894,
+        "last_row_write_wall_s": 0.0002971320000142441,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 30.082024520999994,
+          "elapsed_s": 0.03298228400001335
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 895,
+        "t_s": 30.148265600999935,
+        "queue_size_approx": 1,
+        "rows_completed": 895,
+        "last_row_write_wall_s": 0.00029208099999777914,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 30.115447141000004,
+          "elapsed_s": 0.03281845999993038
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 896,
+        "t_s": 30.181584593000025,
+        "queue_size_approx": 1,
+        "rows_completed": 896,
+        "last_row_write_wall_s": 0.0003007779999961713,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 30.148707549999926,
+          "elapsed_s": 0.03287704300009864
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 897,
+        "t_s": 30.215136720000032,
+        "queue_size_approx": 1,
+        "rows_completed": 897,
+        "last_row_write_wall_s": 0.0002895819999366722,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 30.182014148999997,
+          "elapsed_s": 0.03312257100003535
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 898,
+        "t_s": 30.248347608000017,
+        "queue_size_approx": 1,
+        "rows_completed": 898,
+        "last_row_write_wall_s": 0.0003191079999851354,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 30.215617725000016,
+          "elapsed_s": 0.03272988300000179
+        }
+      },
+      {
+        "event": "enqueued",
+        "tick": 899,
+        "t_s": 30.28167540100003,
+        "queue_size_approx": 1,
+        "rows_completed": 899,
+        "last_row_write_wall_s": 0.0005727060000708661,
+        "worker": {
+          "operation": "waiting_for_row",
+          "tick": null,
+          "started_s": 30.249084137999944,
+          "elapsed_s": 0.032591263000085746
+        }
+      }
+    ],
+    "first_fault": null,
+    "writer_error": null,
+    "operation_timings": {
+      "header": {
+        "count": 1,
+        "last_wall_s": 0.00021824099997047597,
+        "max_wall_s": 0.00021824099997047597,
+        "last_thread_cpu_s": 0.00021,
+        "max_thread_cpu_s": 0.00021,
+        "last_tick": null,
+        "max_wall_tick": null
+      },
+      "row": {
+        "count": 900,
+        "last_wall_s": 0.0003106719999550478,
+        "max_wall_s": 0.001496285999905922,
+        "last_thread_cpu_s": 0.0003057289999999768,
+        "max_thread_cpu_s": 0.0014989060000000004,
+        "last_tick": 899,
+        "max_wall_tick": 16
+      },
+      "flush": {
+        "count": 1,
+        "last_wall_s": 0.00013830799991865206,
+        "max_wall_s": 0.00013830799991865206,
+        "last_thread_cpu_s": 0.0001339580000000451,
+        "max_thread_cpu_s": 0.0001339580000000451,
+        "last_tick": null,
+        "max_wall_tick": null
+      }
+    },
+    "final": {
+      "event": "closed",
+      "tick": null,
+      "t_s": 30.29069893999997,
+      "queue_size_approx": 0,
+      "rows_completed": 900,
+      "last_row_write_wall_s": 0.0003106719999550478,
+      "worker": {
+        "operation": "done",
+        "tick": null,
+        "started_s": 30.290319373999978,
+        "elapsed_s": 0.0003795659999923373
+      }
+    }
+  }
+}

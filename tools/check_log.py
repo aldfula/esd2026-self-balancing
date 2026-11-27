@@ -21,6 +21,7 @@ import csv
 import json
 import math
 from pathlib import Path
+import struct
 import sys
 
 UNIT_TO_SECONDS = {"s": 1.0, "ms": 1e-3, "us": 1e-6, "ns": 1e-9}
@@ -45,7 +46,8 @@ def parse_args():
 def check_imu(path, rows, rate):
     """Validate acquisition completion as well as the CSV's timing subset."""
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-    from src.sensing.imu_calib import RAW_FIELDS, UNIT_FIELDS
+    from src.sensing.imu_calib import (RAW_FIELDS, UNIT_FIELDS, CORRECTED_FIELDS,
+                                       convert_sample, apply_gyro_bias, validate_gyro_bias)
     from src.sensing.mpu6050 import REGISTERS, SAMPLE_RATE_HZ
 
     problems = []
@@ -58,8 +60,22 @@ def check_imu(path, rows, rate):
         if not math.isfinite(seconds) or seconds < 2 / rate:
             raise ValueError("invalid run duration")
         target = math.ceil(seconds * rate)
+        schema = record.get("schema")
+        bias = None
+        if schema == "mpu6050-sensor-v2":
+            calibration = record["gyro_bias"]
+            if (not isinstance(calibration, dict) or
+                    set(calibration) != {"applied", "config"} or
+                    calibration["applied"] is not True):
+                raise ValueError("v2 requires an explicitly applied gyro bias")
+            bias = validate_gyro_bias(calibration["config"])
+        elif schema == "mpu6050-sensor-v1":
+            if "gyro_bias" in record or "gyro_bias_config_path" in record:
+                raise ValueError("v1 cannot contain gyro bias metadata")
+        else:
+            raise ValueError("unsupported IMU schema")
         checks = {
-            "schema": "mpu6050-sensor-v1", "status": "complete", "reason": "",
+            "status": "complete", "reason": "",
             "rate_hz": rate, "sensor_rate_hz": 100.0, "i2c_err": 0,
             "target_samples": target, "samples": len(rows),
             "axis_frame": "sensor_uncalibrated", "motor_interface": "none",
@@ -93,6 +109,18 @@ def check_imu(path, rows, rate):
             for name in UNIT_FIELDS:
                 if not math.isfinite(float(row[name])):
                     raise ValueError(f"nonfinite sensor value: {name}")
+            expected_sample = convert_sample(struct.pack(">7h", *(int(row[name]) for name in RAW_FIELDS)))
+            checked_fields = UNIT_FIELDS
+            if bias is not None:
+                expected_sample = apply_gyro_bias(expected_sample, bias)
+                checked_fields += CORRECTED_FIELDS
+            elif any(name in row for name in CORRECTED_FIELDS):
+                raise ValueError("v1 cannot contain corrected gyro columns")
+            for name in checked_fields:
+                actual = float(row[name])
+                if not math.isfinite(actual) or not math.isclose(
+                        actual, expected_sample[name], rel_tol=0, abs_tol=1e-12):
+                    raise ValueError(f"sensor conversion/correction mismatch: {name} at tick {index}")
             read_s = float(row["read_s"])
             t = float(row["t"])
             if not math.isfinite(read_s) or not 0 <= read_s < 1.5 / rate:

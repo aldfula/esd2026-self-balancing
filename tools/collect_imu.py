@@ -19,7 +19,8 @@ import sys
 import threading
 import time
 
-from src.sensing.imu_calib import RAW_FIELDS, UNIT_FIELDS
+from src.sensing.imu_calib import (RAW_FIELDS, UNIT_FIELDS, CORRECTED_FIELDS,
+                                   apply_gyro_bias, load_gyro_bias, validate_gyro_bias)
 from src.sensing.mpu6050 import MPU6050, SAMPLE_RATE_HZ
 
 FIELDS = ("t", "tick", "theta_deg", "gyro_dps", "wheel_l", "wheel_r",
@@ -29,7 +30,8 @@ FIELDS = ("t", "tick", "theta_deg", "gyro_dps", "wheel_l", "wheel_r",
 
 class CSVWriter:
     """Bounded, nonblocking producer; disk writes occur on a worker thread."""
-    def __init__(self, stream, *, diagnostics=False):
+    def __init__(self, stream, *, diagnostics=False, fields=FIELDS):
+        self.fields = fields
         self.queue = queue.Queue(maxsize=128)
         self.error = None
         self.rows = 0
@@ -99,7 +101,7 @@ class CSVWriter:
 
     def _write(self, stream):
         try:
-            writer = csv.DictWriter(stream, fieldnames=FIELDS)
+            writer = csv.DictWriter(stream, fieldnames=self.fields)
             if self.diagnostics:
                 started = self._begin("header")
             writer.writeheader()
@@ -157,20 +159,27 @@ class CSVWriter:
 
 def collect(sensor, stream, seconds=30.0, vbat=None, *,
             clock=time.monotonic, sleep=time.sleep, metadata=None,
-            writer_diagnostics=False):
+            writer_diagnostics=False, gyro_bias=None):
     """Return a run record; any fault stops at its first occurrence."""
     if not math.isfinite(seconds) or seconds < 2 / SAMPLE_RATE_HZ:
         raise ValueError("duration must allow at least two samples")
     if vbat is not None and (not math.isfinite(vbat) or vbat <= 0):
         raise ValueError("manual battery voltage must be positive and finite")
+    bias = validate_gyro_bias(gyro_bias) if gyro_bias is not None else None
     target = math.ceil(seconds * SAMPLE_RATE_HZ)
     result = metadata if metadata is not None else {}
+    if "gyro_bias" in result:
+        raise ValueError("run metadata already contains gyro bias state")
     result.update(schema="mpu6050-sensor-v1", status="running", reason="",
                   rate_hz=SAMPLE_RATE_HZ, seconds=seconds, target_samples=target,
                   samples=0, i2c_err=0, sensor_rate_hz=100.0,
                   axis_frame="sensor_uncalibrated", motor_interface="none",
                   vbat=vbat, vbat_source="manual_pre_run" if vbat else "unmeasured")
-    writer = CSVWriter(stream, diagnostics=writer_diagnostics)
+    if bias is not None:
+        result.update(schema="mpu6050-sensor-v2",
+                      gyro_bias={"applied": True, "config": bias})
+    fields = FIELDS + CORRECTED_FIELDS if bias is not None else FIELDS
+    writer = CSVWriter(stream, diagnostics=writer_diagnostics, fields=fields)
     previous = None
     try:
         result["registers_start"] = sensor.configure(sleep=sleep)
@@ -184,6 +193,8 @@ def collect(sensor, stream, seconds=30.0, vbat=None, *,
                    "valid": 1, "error": ""}
             try:
                 row.update(sensor.read())
+                if bias is not None:
+                    row = apply_gyro_bias(row, bias)
             except (OSError, ValueError) as exc:
                 if isinstance(exc, OSError):
                     result["i2c_err"] += 1
@@ -228,6 +239,8 @@ def main():
     parser.add_argument("--vbat", type=float, help="manually measured pre-run battery V")
     parser.add_argument("--writer-diagnostics", action="store_true",
                         help="save bounded in-memory CSV writer diagnostics in the run JSON")
+    parser.add_argument("--gyro-bias", type=Path, metavar="CONFIG",
+                        help="explicitly apply sensor-axis gyro bias from this JSON file")
     args = parser.parse_args()
     if args.bus < 0 or not math.isfinite(args.seconds) or args.seconds < 2 / SAMPLE_RATE_HZ:
         parser.error("bus must be nonnegative and duration must allow two samples")
@@ -235,8 +248,14 @@ def main():
         parser.error("--vbat must be positive and finite")
     if args.output.suffix != ".csv":
         parser.error("--output must end in .csv")
+    try:
+        bias = load_gyro_bias(args.gyro_bias) if args.gyro_bias is not None else None
+    except (OSError, ValueError, OverflowError) as exc:
+        parser.error(f"--gyro-bias: {exc}")
     record = {"status": "running", "started_at": datetime.now().astimezone().isoformat(),
               "bus": args.bus, "address": args.address}
+    if args.gyro_bias is not None:
+        record["gyro_bias_config_path"] = str(args.gyro_bias)
     try:
         from smbus2 import SMBus
         args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -248,7 +267,8 @@ def main():
             try:
                 with SMBus(args.bus) as bus:
                     collect(MPU6050(bus, args.address), stream, args.seconds, args.vbat,
-                            metadata=record, writer_diagnostics=args.writer_diagnostics)
+                            metadata=record, writer_diagnostics=args.writer_diagnostics,
+                            gyro_bias=bias)
             except (OSError, ValueError) as exc:
                 record.update(status="void", reason=f"{type(exc).__name__}: {exc}")
             sidecar.seek(0)

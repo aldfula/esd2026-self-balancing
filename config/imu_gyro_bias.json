@@ -1,0 +1,17 @@
+{
+  "schema": "mpu6050-gyro-bias-v1",
+  "axis_frame": "sensor",
+  "units": "deg/s",
+  "operation": "g_corrected = g - b",
+  "bias_dps": {
+    "x": -1.487040,
+    "y": 1.471874,
+    "z": -2.600636
+  },
+  "evidence": {
+    "source_log": "logs/imu-replacement-static-scout-2026-11-24.csv",
+    "validation_record": "logs/experiments/2026-11-24-imu-gyro-bias-confirmation-resume.md",
+    "adoption_commit": "d509491d44742c9c2242348784b1f9282e86ee07",
+    "scope": "Replacement MPU6050, stationary sensor axes, observed 24.03-24.13 deg C; body axes and upright offset unmeasured."
+  }
+}

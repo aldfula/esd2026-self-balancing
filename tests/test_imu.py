@@ -2,7 +2,9 @@
 
 from contextlib import redirect_stdout
 from contextlib import nullcontext
+from copy import deepcopy
 import csv
+from decimal import Decimal
 import errno
 import io
 import json
@@ -17,7 +19,9 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from src.sensing.imu_calib import convert_sample
+from src.sensing.imu_calib import (convert_sample, apply_gyro_bias, load_gyro_bias,
+                                   validate_gyro_bias, CORRECTED_FIELDS, RAW_FIELDS,
+                                   UNIT_FIELDS)
 from src.sensing.mpu6050 import MPU6050
 from tools.collect_imu import CSVWriter, collect
 from tools import check_log
@@ -74,13 +78,14 @@ class Bus:
 
 
 class IMUTests(unittest.TestCase):
-    def acquire(self, fault=None, seconds=30.0, vbat=None, *, writer_diagnostics=False):
+    def acquire(self, fault=None, seconds=30.0, vbat=None, *, writer_diagnostics=False,
+                gyro_bias=None):
         clock = Clock()
         bus = Bus(clock, fault)
         stream = io.StringIO(newline="")
         result = collect(MPU6050(bus), stream, seconds, vbat,
                          clock=clock, sleep=clock.sleep,
-                         writer_diagnostics=writer_diagnostics)
+                         writer_diagnostics=writer_diagnostics, gyro_bias=gyro_bias)
         rows = list(csv.DictReader(io.StringIO(stream.getvalue())))
         return result, rows, stream.getvalue(), bus
 
@@ -115,6 +120,7 @@ class IMUTests(unittest.TestCase):
             "bad_tick": lambda r: r[400].update(tick="999"),
             "invalid_sensor": lambda r: r[400].update(ax_g="nan"),
             "missing_sensor": lambda r: r[400].update(gx_dps=""),
+            "wrong_conversion": lambda r: r[400].update(gx_dps="2"),
             "i2c_error": lambda r: r[400].update(i2c_err="1"),
             "invalid_row": lambda r: r[400].update(valid="0"),
             "fabricated_angle": lambda r: r[400].update(theta_deg="0"),
@@ -400,6 +406,201 @@ class IMUTests(unittest.TestCase):
                  "--count-tol", "0.5"], cwd=ROOT, capture_output=True, text=True)
             self.assertEqual(checked.returncode, 1, checked.stdout + checked.stderr)
             self.assertIn("largest gap", checked.stdout)
+
+    def test_adopted_config_and_full_range_correction_against_decimal(self):
+        config = load_gyro_bias(ROOT / "config/imu_gyro_bias.json")
+        expected_bias = {"x": Decimal("-1.487040"), "y": Decimal("1.471874"),
+                         "z": Decimal("-2.600636")}
+        self.assertEqual(config["bias_dps"], {k: float(v) for k, v in expected_bias.items()})
+        self.assertEqual(config["evidence"]["adoption_commit"],
+                         "d509491d44742c9c2242348784b1f9282e86ee07")
+        for name in ("source_log", "validation_record"):
+            self.assertTrue((ROOT / config["evidence"][name]).is_file())
+        for value in range(-32768, 32768):
+            sample = convert_sample(struct.pack(">7h", *([value] * 7)))
+            corrected = apply_gyro_bias(sample, config)
+            self.assertEqual(sample, {k: corrected[k] for k in sample})
+            self.assertFalse(set(CORRECTED_FIELDS) & sample.keys())
+            for axis, field in zip("xyz", CORRECTED_FIELDS):
+                expected = Decimal(value) / Decimal(131) - expected_bias[axis]
+                self.assertLessEqual(abs(Decimal(str(corrected[field])) - expected),
+                                     Decimal("1e-12"))
+
+    def test_bias_zero_residual_and_double_application_guard(self):
+        config = load_gyro_bias(ROOT / "config/imu_gyro_bias.json")
+        sample = {f"g{a}_dps": config["bias_dps"][a] for a in "xyz"}
+        corrected = apply_gyro_bias(sample, config)
+        self.assertEqual([corrected[k] for k in CORRECTED_FIELDS], [0, 0, 0])
+        with self.assertRaisesRegex(ValueError, "already present"):
+            apply_gyro_bias(corrected, config)
+        sensor_clock = Clock()
+        sensor = MPU6050(Bus(sensor_clock))
+        original_read = sensor.read
+        with patch.object(sensor, "read", side_effect=lambda: apply_gyro_bias(original_read(), config)):
+            result = collect(sensor, io.StringIO(), 1, clock=sensor_clock,
+                             sleep=sensor_clock.sleep, gyro_bias=config)
+        self.assertEqual(result["status"], "void")
+        self.assertEqual(result["samples"], 1)
+        self.assertIn("already present", result["reason"])
+
+    def test_invalid_bias_config_rejected_before_sensor_or_output(self):
+        config = load_gyro_bias(ROOT / "config/imu_gyro_bias.json")
+        malformed = [None, [], {}, dict(config, unknown=1)]
+        for key, value in (("units", "rad/s"), ("axis_frame", "body"),
+                           ("schema", "unknown"), ("operation", "g + b"),
+                           ("evidence", {}), ("bias_dps", {"x": 0, "y": 0})):
+            malformed.append(dict(config, **{key: value}))
+        for value in (True, "1", None, float("nan"), float("inf"), -251, 10 ** 500):
+            bad = deepcopy(config)
+            bad["bias_dps"]["x"] = value
+            malformed.append(bad)
+        malformed.append(dict(config, evidence=dict(config["evidence"], adoption_commit="bad")))
+        from tools import collect_imu
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "invalid.json"
+            output = Path(directory) / "unused.csv"
+            for bad in malformed:
+                with self.subTest(bad=repr(bad)[:100]):
+                    with self.assertRaises(ValueError):
+                        validate_gyro_bias(bad)
+                    path.write_text(json.dumps(bad))
+                    with patch.object(sys, "argv", ["collect_imu", "--output", str(output),
+                                                    "--gyro-bias", str(path)]), \
+                            patch.dict(sys.modules, {"smbus2": SimpleNamespace(
+                                SMBus=lambda n: self.fail("invalid config touched I2C"))}), \
+                            patch("sys.stderr", io.StringIO()), self.assertRaises(SystemExit) as stopped:
+                        collect_imu.main()
+                    self.assertEqual(stopped.exception.code, 2)
+                    self.assertFalse(output.exists())
+                    self.assertFalse(Path(str(output) + ".json").exists())
+            for text in ('{"schema": "x", "schema": "y"}', '{invalid'):
+                path.write_text(text)
+                with self.assertRaises(ValueError):
+                    load_gyro_bias(path)
+            with self.assertRaises(OSError):
+                load_gyro_bias(Path(directory) / "missing.json")
+        clock = Clock()
+        bus = Bus(clock)
+        stream = io.StringIO()
+        with self.assertRaises(ValueError):
+            collect(MPU6050(bus), stream, 1, gyro_bias={})
+        self.assertEqual(bus.config_writes, [])
+        self.assertEqual(stream.getvalue(), "")
+
+    def test_explicit_bias_run_preserves_baseline_and_records_snapshot(self):
+        config = load_gyro_bias(ROOT / "config/imu_gyro_bias.json")
+        baseline, raw_rows, _, _ = self.acquire(seconds=1)
+        result, rows, text, bus = self.acquire(seconds=1, gyro_bias=config,
+                                              writer_diagnostics=True)
+        self.assertEqual((bus.samples, result["samples"], len(rows)), (30, 30, 30))
+        self.assertEqual(result["schema"], "mpu6050-sensor-v2")
+        self.assertIs(result["gyro_bias"]["applied"], True)
+        self.assertEqual(result["gyro_bias"]["config"], config)
+        config["bias_dps"]["x"] = 0
+        self.assertEqual(result["gyro_bias"]["config"]["bias_dps"]["x"], -1.487040)
+        for before, after in zip(raw_rows, rows):
+            self.assertEqual(before, {key: after[key] for key in before})
+        self.assertEqual(self.checker(text, result)[0], 0)
+        self.assertEqual(baseline["schema"], "mpu6050-sensor-v1")
+        failed, rows, text, _ = self.acquire("i2c", gyro_bias=load_gyro_bias(
+            ROOT / "config/imu_gyro_bias.json"))
+        self.assertEqual((failed["status"], len(rows)), ("void", 4))
+        self.assertTrue(all(rows[-1][name] == "" for name in CORRECTED_FIELDS))
+        self.assertEqual(self.checker(text, failed)[0], 1)
+
+    def test_corrected_checker_positive_controls(self):
+        config = load_gyro_bias(ROOT / "config/imu_gyro_bias.json")
+        result, rows, text, _ = self.acquire(seconds=1, gyro_bias=config)
+        self.assertEqual(self.checker(text, result)[0], 0)
+        for name, value in (("gx_corrected_dps", "nan"), ("gy_corrected_dps", ""),
+                            ("gz_corrected_dps", "0"), ("gx_dps", "2")):
+            changed = deepcopy(rows)
+            changed[0][name] = value
+            with self.subTest(field=name):
+                self.assertEqual(self.checker(self.encode_rows(changed), result)[0], 1)
+        for sign in (-1, 1):
+            changed = deepcopy(rows)
+            # Inject either an addition in place of subtraction, or subtraction twice.
+            changed[0]["gx_corrected_dps"] = str(float(rows[0]["gx_dps"]) +
+                sign * (2 if sign == -1 else 1) * config["bias_dps"]["x"])
+            self.assertEqual(self.checker(self.encode_rows(changed), result)[0], 1)
+        changed = [{k: v for k, v in row.items() if k != CORRECTED_FIELDS[0]} for row in rows]
+        self.assertEqual(self.checker(self.encode_rows(changed), result)[0], 1)
+        for update in ({"schema": "mpu6050-sensor-v1"}, {"schema": "unknown"},
+                       {"gyro_bias": {"applied": False, "config": config}},
+                       {"gyro_bias": {"applied": 1, "config": config}},
+                       {"gyro_bias": None}):
+            self.assertEqual(self.checker(text, dict(result, **update))[0], 1)
+        bad_record = deepcopy(result)
+        bad_record["gyro_bias"]["config"]["bias_dps"]["x"] = 0
+        self.assertEqual(self.checker(text, bad_record)[0], 1)
+        no_columns = [{k: v for k, v in row.items() if k not in CORRECTED_FIELDS} for row in rows]
+        self.assertEqual(self.checker(self.encode_rows(no_columns), result)[0], 1)
+        legacy, legacy_rows, _, _ = self.acquire(seconds=1)
+        legacy_rows[0]["gx_corrected_dps"] = ""
+        for row in legacy_rows[1:]:
+            row["gx_corrected_dps"] = ""
+        self.assertEqual(self.checker(self.encode_rows(legacy_rows), legacy)[0], 1)
+
+    def test_bias_cli_pair_and_external_checker_with_fake_i2c(self):
+        from tools import collect_imu
+        config_path = ROOT / "config/imu_gyro_bias.json"
+        clock = Clock()
+        bus = Bus(clock)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "corrected.csv"
+            def virtual_collect(*args, **kwargs):
+                return collect(*args, clock=clock, sleep=clock.sleep, **kwargs)
+            with patch.dict(sys.modules, {"smbus2": SimpleNamespace(SMBus=lambda n: nullcontext(bus))}), \
+                    patch.object(sys, "argv", ["collect_imu", "--output", str(path),
+                                              "--seconds", "1", "--gyro-bias", str(config_path)]), \
+                    patch.object(collect_imu, "collect", side_effect=virtual_collect), \
+                    redirect_stdout(io.StringIO()):
+                self.assertEqual(collect_imu.main(), 0)
+            record = json.loads(Path(str(path) + ".json").read_text())
+            self.assertEqual(record["gyro_bias_config_path"], str(config_path))
+            self.assertEqual(record["gyro_bias"]["config"], load_gyro_bias(config_path))
+            checked = subprocess.run([sys.executable, "-B", "tools/check_log.py", str(path),
+                                      "--rate", "30", "--imu"], cwd=ROOT,
+                                     capture_output=True, text=True)
+            self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
+
+    def test_three_existing_runs_replay_against_independent_decimal(self):
+        config = load_gyro_bias(ROOT / "config/imu_gyro_bias.json")
+        biases = [Decimal("-1.487040"), Decimal("1.471874"), Decimal("-2.600636")]
+        fields_checked = 0
+        for run in ("r03", "r04", "r05"):
+            path = ROOT / f"logs/imu-bias-validation-2026-11-24-{run}.csv"
+            original = path.read_text()
+            record = json.loads(Path(str(path) + ".json").read_text())
+            self.assertEqual(self.checker(original, record)[0], 0)
+            source = list(csv.DictReader(io.StringIO(original)))
+            clock = Clock()
+            class ReplayBus(Bus):
+                def read_i2c_block_data(self, address, register, length):
+                    self.clock.now += 0.001
+                    raw = [int(source[self.samples][name]) for name in RAW_FIELDS]
+                    self.samples += 1
+                    return list(struct.pack(">7h", *raw))
+            bus = ReplayBus(clock)
+            stream = io.StringIO()
+            result = collect(MPU6050(bus), stream, 30, record["vbat"], clock=clock,
+                             sleep=clock.sleep, gyro_bias=config)
+            self.assertEqual((result["status"], bus.samples), ("complete", 900))
+            self.assertEqual(self.checker(stream.getvalue(), result)[0], 0)
+            replay = list(csv.DictReader(io.StringIO(stream.getvalue())))
+            self.assertEqual(len(replay), len(source))
+            for before, after in zip(source, replay):
+                for name in RAW_FIELDS + UNIT_FIELDS:
+                    self.assertEqual(before[name], after[name])
+                    fields_checked += 1
+                for axis, bias, field in zip("xyz", biases, CORRECTED_FIELDS):
+                    expected = Decimal(before[f"g{axis}_raw"]) / Decimal(131) - bias
+                    self.assertLessEqual(abs(Decimal(after[field]) - expected), Decimal("1e-12"))
+                    fields_checked += 1
+            with path.open() as source_stream:
+                self.assertEqual(list(csv.DictReader(source_stream)), source)
+        self.assertEqual(fields_checked, 45900)
 
 
 if __name__ == "__main__":
